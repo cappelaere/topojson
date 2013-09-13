@@ -8,7 +8,11 @@ var path = require("path"),
     queue = require("queue-async"),
     topojson = require("../");
 
-// PGC Mod for windowless applications
+// PGC Modified for windowless applications
+// If you try to load d3 directly, jsdom will create an empty window that will cause trouble for D3
+// Since we really do not need this, let's bypass most of d3/index.js and load d3.js directly
+//
+
 var d3 = (new Function("window", "document",
 	"return " + fs.readFileSync(path.join(__dirname, "../node_modules/d3/d3.js"), "utf-8"))
 )(window, document);
