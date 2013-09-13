@@ -2,12 +2,17 @@
 
 var path = require("path"),
     fs = require("fs"),
-    d3 = require("d3"),
+    // d3 = require("d3"),
     optimist = require("optimist"),
     shapefile = require("shapefile"),
     queue = require("queue-async"),
     topojson = require("../");
 
+// PGC Mod for windowless applications
+var d3 = (new Function("window", "document",
+	"return " + fs.readFileSync(path.join(__dirname, "../node_modules/d3/d3.js"), "utf-8"))
+)(window, document);
+	
 require("d3-geo-projection")(d3);
 
 var argv = optimist
@@ -122,7 +127,14 @@ var argv = optimist
       type: "boolean",
       default: false
     })
+    .options("version", {
+      describe: "display version",
+      type: "boolean",
+      default: false
+    })
     .check(function(argv) {
+	//console.log( "argv:", argv )
+	  if( argv.version ) return;
       if (argv.help) return;
       if (!argv._.length) throw new Error("input required");
       if (+argv.s && +argv["simplify-proportion"]) throw new Error("--simplify and --simplify-proportion are exclusive");
@@ -138,6 +150,11 @@ var argv = optimist
     .argv;
 
 if (argv.help) return optimist.showHelp();
+
+if( argv.version ) {
+	console.log("Version:", topojson.version);
+	return;
+}
 
 var objects = {},
     id = argv["id-property"];
